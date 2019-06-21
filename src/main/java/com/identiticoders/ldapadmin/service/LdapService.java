@@ -10,22 +10,9 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.security.KeyFactory;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
 import java.security.Security;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -55,7 +42,6 @@ import com.unboundid.ldap.sdk.persist.LDAPPersistException;
 import com.unboundid.ldap.sdk.persist.LDAPPersister;
 import com.unboundid.ldif.LDIFException;
 import java.io.File;
-import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -115,8 +101,9 @@ public class LdapService {
         byte[] encodedP12Cert = Base64.encodeBase64(p12Cert);
 
         String[] ldifLines = {"dn: " + "cn=" + cn + "," + entryDN,
-            "objectClass: top", "objectClass: tlsKeyInfo",
-            "objectClass: person", "objectClass: organizationalPerson",
+            "objectClass: top",
+            "objectClass: person",
+            "objectClass: organizationalPerson",
             "objectClass: inetOrgPerson", "changetype: add", "cn: " + cn,
             "sn: " + cn, "mail: " + cn, "keyAlgorithm: RSA",
             // "privateKey: " + new String(encodedp12Cert),
@@ -169,61 +156,121 @@ public class LdapService {
         // System.exit(result);
     }
 
-    public void createWithPersistObject(String entryDN, String cn,
-            byte[] p12Cert, byte[] publicKey, byte[] privateKey) {
+//    public void createWithPersistObject(String entryDN, String cn,
+//            byte[] p12Cert, byte[] publicKey, byte[] privateKey) {
+//
+//        byte[] encodedPrivateCert = Base64.encodeBase64(privateKey);
+//        byte[] encodedP12Cert = Base64.encodeBase64(p12Cert);
+//
+//        LDAPPersister<User> persister = null;
+//        try {
+//            persister = LDAPPersister.getInstance(User.class);
+//        } catch (LDAPPersistException e2) {
+//            // TODO Auto-generated catch block
+//            e2.printStackTrace();
+//        }
+//
+//        // Create a new MyObject instance and add it to the directory. We can
+//        // use
+//        // a parent DN of null to indicate that it should use the default
+//        // defined
+//        // in the @LDAPObject annotation.
+//        LDAPConnection ldapConnection = null;
+//        try {
+//            ldapConnection = getLdapConnection();
+//        } catch (LDAPException e1) {
+//            // TODO Auto-generated catch block
+//            e1.printStackTrace();
+//        }
+//
+//        User user = new User();
+//        user.setDn("cn=" + cn + "," + entryDN);
+//        user.setCn(cn);
+//        user.setSn(cn);
+//        user.setMail(cn);
+//        user.setPrivateKey(encodedPrivateCert);
+//        user.setPublicKey(publicKey);
+//        user.setUserCertificate(publicKey);
+//        user.setUserPKCS12(encodedP12Cert);
+//
+//        LDAPResult ldapResult = null;
+//        int result;
+//        try {
+//            ldapResult = persister.add(user, ldapConnection, null);
+//
+//            System.out.println(ldapResult);
+//
+//        } catch (Exception e) {
+//            System.err.println(e);
+//        } finally {
+//            ldapConnection.close();
+//
+//            // Convert the result code to an integer for use in the exit method.
+//            result = ldapResult == null ? 1 : ldapResult.getResultCode()
+//                    .intValue();
+//        }
+//
+//        // System.exit(result);
+//    }
+    
+    public void createLdapForWrenDS(String entryDN, String cn, String mail, String description) {
 
-        byte[] encodedPrivateCert = Base64.encodeBase64(privateKey);
-        byte[] encodedP12Cert = Base64.encodeBase64(p12Cert);
+        String[] ldifLines = {"dn: " + "cn=" + cn + "," + entryDN,
+            "objectClass: top",
+            "objectClass: person",
+            "objectClass: organizationalPerson",
+            "objectClass: inetOrgPerson",
+            "cn: " + cn,
+            "sn: " + cn, 
+            "mail: " + mail,
+            "description: " + description
+            //"changetype: add",
+            //"keyAlgorithm: RSA",
+            // "privateKey: " + new String(encodedp12Cert),
+            //"privateKeyFormat: PKCS#8",
+            // "publicKey: " + new String(publicKey),
+            //"publicKeyFormat: X.509", // "userCertificate: " + new String(publicKey),
+        };
 
-        LDAPPersister<User> persister = null;
-        try {
-            persister = LDAPPersister.getInstance(User.class);
-        } catch (LDAPPersistException e2) {
-            // TODO Auto-generated catch block
-            e2.printStackTrace();
-        }
+        LDAPConnectionOptions connectionOptions = new LDAPConnectionOptions();
+        connectionOptions.setAbandonOnTimeout(true);
+        connectionOptions.setConnectTimeoutMillis(OPERATION_TIMEOUT_MILLIS);
 
-        // Create a new MyObject instance and add it to the directory. We can
-        // use
-        // a parent DN of null to indicate that it should use the default
-        // defined
-        // in the @LDAPObject annotation.
-        LDAPConnection ldapConnection = null;
-        try {
-            ldapConnection = getLdapConnection();
-        } catch (LDAPException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-
-        User user = new User();
-        user.setDn("cn=" + cn + "," + entryDN);
-        user.setCn(cn);
-        user.setSn(cn);
-        user.setMail(cn);
-        user.setPrivateKey(encodedPrivateCert);
-        user.setPublicKey(publicKey);
-        user.setUserCertificate(publicKey);
-        user.setUserPKCS12(encodedP12Cert);
-
-        LDAPResult ldapResult = null;
         int result;
+        LDAPResult ldapResult = null;
         try {
-            ldapResult = persister.add(user, ldapConnection, null);
+            // Connect to the server.
+            LDAPConnection ldapConnection = null;
+            ldapConnection = getAuthLdapConnection(psw);
+            try {
 
-            System.out.println(ldapResult);
+                // Create the AddRequest object using the LDIF lines.
+                AddRequest addRequest = new AddRequest(ldifLines);
 
-        } catch (Exception e) {
+//                addRequest.addAttribute("privateKey", encodedPrivateCert);
+//                addRequest.addAttribute("publicKey", publicKey);
+//                addRequest.addAttribute("userCertificate", publicKey);
+//                addRequest.addAttribute("userPKCS12", encodedP12Cert);
+
+                // Transmit the AddRequest to the server.
+                ldapResult = ldapConnection.add(addRequest);
+
+                System.out.println(ldapResult);
+
+            } catch (final LDIFException e) {
+                System.err.println(e);
+            } finally {
+                ldapConnection.close();
+
+                // Convert the result code to an integer for use in the exit
+                // method.
+                result = ldapResult == null ? 1 : ldapResult.getResultCode()
+                        .intValue();
+            }
+        } catch (final LDAPException e) {
             System.err.println(e);
-        } finally {
-            ldapConnection.close();
-
-            // Convert the result code to an integer for use in the exit method.
-            result = ldapResult == null ? 1 : ldapResult.getResultCode()
-                    .intValue();
+            result = 1;
         }
-
-        // System.exit(result);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -350,8 +397,128 @@ public class LdapService {
         }
     }
 
-    public void update(String psw, String entryDN, String cn, String newDn,
-            String newCn, byte[] p12Cert, byte[] publicKey, byte[] privateKey) {
+//    public void update(String psw, String entryDN, String cn, String newDn,
+//            String newCn, byte[] p12Cert, byte[] publicKey, byte[] privateKey) {
+//
+//        LDAPConnection ldapConnection = null;
+//        String fullDn = "cn=" + cn + "," + entryDN;
+//
+//        if (StringUtils.isNotEmpty(newDn) || StringUtils.isNotEmpty(newCn)) {
+//
+//            ModifyDNRequest modifyDNRequest = null;
+//
+//            if (StringUtils.isEmpty(newDn)) {
+//                newDn = entryDN;
+//                modifyDNRequest = new ModifyDNRequest(fullDn, "cn=" + newCn,
+//                        true);
+//            }
+//            if (StringUtils.isEmpty(newCn)) {
+//                newCn = cn;
+//                modifyDNRequest = new ModifyDNRequest(fullDn, "cn=" + newCn,
+//                        true, newDn);
+//            }
+//            if (StringUtils.isNotEmpty(newDn) && StringUtils.isNotEmpty(newCn)) {
+//
+//                modifyDNRequest = new ModifyDNRequest(fullDn, "cn=" + newCn,
+//                        true, newDn);
+//            }
+//
+//            fullDn = "cn=" + newCn + "," + newDn;
+//
+//            try {
+//                ldapConnection = null;
+//                try {
+//                    ldapConnection = getAuthLdapConnection(psw);
+//                } catch (LDAPException e1) {
+//                    // TODO Auto-generated catch block
+//                    e1.printStackTrace();
+//                }
+//                modifyDNRequest.setDeleteOldRDN(true);
+//                LDAPResult modifyDNResult = ldapConnection
+//                        .modifyDN(modifyDNRequest);
+//
+//                System.out.println("The entry was renamed successfully.");
+//            } catch (LDAPException le) {
+//                le.printStackTrace();
+//                System.err.println("The modify DN operation failed.");
+//            }
+//        }
+//
+//        if (StringUtils.isNotEmpty(newCn) || p12Cert != null
+//                || publicKey != null || privateKey != null) {
+//
+//            LDAPPersister<User> persister = null;
+//            try {
+//                persister = LDAPPersister.getInstance(User.class);
+//            } catch (LDAPPersistException e2) {
+//                // TODO Auto-generated catch block
+//                e2.printStackTrace();
+//            }
+//
+//            // Create a new MyObject instance and add it to the directory. We
+//            // can
+//            // use
+//            // a parent DN of null to indicate that it should use the default
+//            // defined
+//            // in the @LDAPObject annotation.
+//            try {
+//                ldapConnection = getAuthLdapConnection(psw);
+//            } catch (LDAPException e1) {
+//                // TODO Auto-generated catch block
+//                e1.printStackTrace();
+//            }
+//
+//            User user = new User();
+//            user.setDn(fullDn);
+//            if (StringUtils.isEmpty(newCn)) {
+//                user.setCn(cn);
+//                user.setSn(cn);
+//                user.setMail(cn);
+//            } else {
+//                user.setCn(newCn);
+//                user.setSn(newCn);
+//                user.setMail(newCn);
+//            }
+//
+//            if (p12Cert != null) {
+//                byte[] encodedP12Cert = Base64.encodeBase64(p12Cert);
+//                user.setUserPKCS12(encodedP12Cert);
+//            }
+//            if (privateKey != null) {
+//                byte[] encodedPrivateCert = Base64.encodeBase64(privateKey);
+//                user.setPrivateKey(encodedPrivateCert);
+//            }
+//
+//            if (publicKey != null) {
+//                user.setPublicKey(publicKey);
+//                user.setUserCertificate(publicKey);
+//            }
+//
+//            LDAPResult ldapResult = null;
+//            int result;
+//            try {
+//                ldapResult = persister
+//                        .modify(user, ldapConnection, null, false);
+//
+//                System.out.println(ldapResult);
+//
+//            } catch (Exception e) {
+//                System.err.println(e);
+//            } finally {
+//                ldapConnection.close();
+//
+//                // Convert the result code to an integer for use in the exit
+//                // method.
+//                result = ldapResult == null ? 1 : ldapResult.getResultCode()
+//                        .intValue();
+//            }
+//        }
+//
+//        // System.exit(result);
+//    }
+
+    public void updateLdapForWrenDS(String entryDN, String cn, 
+            String newDn, String newCn, String email, String description) {
 
         LDAPConnection ldapConnection = null;
         String fullDn = "cn=" + cn + "," + entryDN;
@@ -397,79 +564,65 @@ public class LdapService {
             }
         }
 
-        if (StringUtils.isNotEmpty(newCn) || p12Cert != null
-                || publicKey != null || privateKey != null) {
-
-            LDAPPersister<User> persister = null;
-            try {
-                persister = LDAPPersister.getInstance(User.class);
-            } catch (LDAPPersistException e2) {
-                // TODO Auto-generated catch block
-                e2.printStackTrace();
-            }
-
-            // Create a new MyObject instance and add it to the directory. We
-            // can
-            // use
-            // a parent DN of null to indicate that it should use the default
-            // defined
-            // in the @LDAPObject annotation.
-            try {
-                ldapConnection = getAuthLdapConnection(psw);
-            } catch (LDAPException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-
-            User user = new User();
-            user.setDn(fullDn);
-            if (StringUtils.isEmpty(newCn)) {
-                user.setCn(cn);
-                user.setSn(cn);
-                user.setMail(cn);
-            } else {
-                user.setCn(newCn);
-                user.setSn(newCn);
-                user.setMail(newCn);
-            }
-
-            if (p12Cert != null) {
-                byte[] encodedP12Cert = Base64.encodeBase64(p12Cert);
-                user.setUserPKCS12(encodedP12Cert);
-            }
-            if (privateKey != null) {
-                byte[] encodedPrivateCert = Base64.encodeBase64(privateKey);
-                user.setPrivateKey(encodedPrivateCert);
-            }
-
-            if (publicKey != null) {
-                user.setPublicKey(publicKey);
-                user.setUserCertificate(publicKey);
-            }
-
-            LDAPResult ldapResult = null;
-            int result;
-            try {
-                ldapResult = persister
-                        .modify(user, ldapConnection, null, false);
-
-                System.out.println(ldapResult);
-
-            } catch (Exception e) {
-                System.err.println(e);
-            } finally {
-                ldapConnection.close();
-
-                // Convert the result code to an integer for use in the exit
-                // method.
-                result = ldapResult == null ? 1 : ldapResult.getResultCode()
-                        .intValue();
-            }
+        LDAPPersister<User> persister = null;
+        try {
+            persister = LDAPPersister.getInstance(User.class);
+        } catch (LDAPPersistException e2) {
+            // TODO Auto-generated catch block
+            e2.printStackTrace();
         }
 
+        // Create a new MyObject instance and add it to the directory. We
+        // can use
+        // a parent DN of null to indicate that it should use the default
+        // defined
+        // in the @LDAPObject annotation.
+        try {
+            ldapConnection = getAuthLdapConnection(psw);
+        } catch (LDAPException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+
+        User user = new User();
+        user.setDn(fullDn);
+        if (!StringUtils.isEmpty(newCn)) {
+            user.setCn(newCn);
+            user.setSn(newCn);
+        } else {
+            user.setCn(cn);
+            user.setSn(cn);
+        }
+        
+        if (!StringUtils.isEmpty(email)) {
+            user.setMail(email);
+        } 
+        
+        if (!StringUtils.isEmpty(description)) {
+            user.setDescription(description);
+        } 
+
+        LDAPResult ldapResult = null;
+        int result;
+        try {
+            ldapResult = persister
+                    .modify(user, ldapConnection, null, false);
+
+            System.out.println(ldapResult);
+
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            ldapConnection.close();
+
+            // Convert the result code to an integer for use in the exit
+            // method.
+            result = ldapResult == null ? 1 : ldapResult.getResultCode()
+                    .intValue();
+        }
         // System.exit(result);
     }
-
+    
     public void deleteOneLevel(String psw, String entryDN) {
 
         LDAPConnection ldapConnection = null;
