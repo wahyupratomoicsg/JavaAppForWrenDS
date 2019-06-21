@@ -29,6 +29,9 @@ public class User {
    @LDAPField(attribute = "description")
    private String description;
    
+   @LDAPField(attribute = "employeeType")
+   private String employeeType;
+   
 //   @LDAPField(attribute = "keyAlgorithm")
 //   private String keyAlgorithm = "RSA";
 //
@@ -91,6 +94,14 @@ public class User {
        this.description = description;
    }
 
+   public String getEmployeeType() {
+       return employeeType;
+   }
+
+   public void setEmployeeType(String employeeType) {
+       this.employeeType = employeeType;
+   }
+   
 //   public String getKeyAlgorithm() {
 //       return keyAlgorithm;
 //   }

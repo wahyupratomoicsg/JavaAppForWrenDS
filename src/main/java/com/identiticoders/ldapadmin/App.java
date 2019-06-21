@@ -35,6 +35,7 @@ public class App {
         System.out.println("2: retrieve");
         System.out.println("3: update");
         System.out.println("4: delete");
+        System.out.println("5: enable/disable");
 
         Scanner input = new Scanner(System.in);
         System.out.print("Key in the selection : ");
@@ -170,6 +171,30 @@ public class App {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
                         }       
+                        break;
+                    }
+                case 5:
+                    {
+                        System.out.print("Please input the entry dn: ");
+                        Scanner inputScanner = new Scanner(System.in);
+                        String dn = inputScanner.next();
+                        System.out.println("entry dn: " + dn);
+                        
+                        System.out.print("Please input the entry cn: ");
+                        inputScanner = new Scanner(System.in);
+                        String cn = inputScanner.next();
+                        System.out.println("entry cn: " + cn);
+                        
+                        System.out.print("Enable y/n? [y] : ");
+                        inputScanner = new Scanner(System.in);
+                        String ena = inputScanner.next();
+                        System.out.println("entry enable: " + ena);
+                        
+                        boolean enabled = true;
+                        if (ena.equalsIgnoreCase("n")) {
+                            enabled = false;
+                        } 
+                        service.enableDisableUserForWrenDS(dn, cn, enabled);
                         break;
                     }
                 default:

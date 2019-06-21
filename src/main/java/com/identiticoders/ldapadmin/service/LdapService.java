@@ -223,7 +223,8 @@ public class LdapService {
             "cn: " + cn,
             "sn: " + cn, 
             "mail: " + mail,
-            "description: " + description
+            "description: " + description,
+            "employeeType: " + "enabled"
             //"changetype: add",
             //"keyAlgorithm: RSA",
             // "privateKey: " + new String(encodedp12Cert),
@@ -601,6 +602,58 @@ public class LdapService {
         if (!StringUtils.isEmpty(description)) {
             user.setDescription(description);
         } 
+
+        LDAPResult ldapResult = null;
+        int result;
+        try {
+            ldapResult = persister
+                    .modify(user, ldapConnection, null, false);
+
+            System.out.println(ldapResult);
+
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            ldapConnection.close();
+
+            // Convert the result code to an integer for use in the exit
+            // method.
+            result = ldapResult == null ? 1 : ldapResult.getResultCode()
+                    .intValue();
+        }
+        // System.exit(result);
+    }
+    
+    public void enableDisableUserForWrenDS(String entryDN, String cn, 
+            boolean enaStatus) {
+
+        LDAPConnection ldapConnection = null;
+        String fullDn = "cn=" + cn + "," + entryDN;
+
+        LDAPPersister<User> persister = null;
+        try {
+            persister = LDAPPersister.getInstance(User.class);
+        } catch (LDAPPersistException e2) {
+            // TODO Auto-generated catch block
+            e2.printStackTrace();
+        }
+
+        // Create a new MyObject instance and add it to the directory. We
+        // can use
+        // a parent DN of null to indicate that it should use the default
+        // defined
+        // in the @LDAPObject annotation.
+        try {
+            ldapConnection = getAuthLdapConnection(psw);
+        } catch (LDAPException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+
+        User user = new User();
+        user.setDn(fullDn);
+        
+        user.setEmployeeType(enaStatus?"enabled":"disabled");
 
         LDAPResult ldapResult = null;
         int result;
