@@ -13,9 +13,9 @@
     <dependencies>
         <!--dependency for unbound LDAP-->
         <dependency>
-          <groupId>com.unboundid</groupId>
-          <artifactId>unboundid-ldapsdk</artifactId>
-          <version>4.0.11</version>
+            <groupId>com.unboundid</groupId>
+            <artifactId>unboundid-ldapsdk</artifactId>
+            <version>4.0.11</version>
         </dependency>
         
         <dependency>
@@ -38,5 +38,4 @@
             <version>1.62</version>
         </dependency>
     </dependencies>
-    
 </project>

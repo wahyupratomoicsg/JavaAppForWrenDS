@@ -10,7 +10,7 @@ import com.unboundid.ldap.sdk.persist.LDAPDNField;
 import com.unboundid.ldap.sdk.persist.LDAPField;
 import com.unboundid.ldap.sdk.persist.LDAPObject;
 
-@LDAPObject(structuralClass = "inetOrgPerson", auxiliaryClass = "tlsKeyInfo", defaultParentDN = "ou=users,ou=system")
+@LDAPObject(structuralClass = "inetOrgPerson", defaultParentDN = "ou=People,ou=users,ou=system")
 public class User {
 
    @LDAPDNField
@@ -26,26 +26,32 @@ public class User {
    @LDAPField(attribute = "mail")
    private String mail;
 
-   @LDAPField(attribute = "keyAlgorithm")
-   private String keyAlgorithm = "RSA";
-
-   @LDAPField(attribute = "privateKeyFormat")
-   private String privateKeyFormat = "PKCS#8";
-
-   @LDAPField(attribute = "publicKeyFormat")
-   private String publicKeyFormat = "X.509";
-
-   @LDAPField(attribute = "privateKey")
-   private byte[] privateKey;
-
-   @LDAPField(attribute = "publicKey")
-   private byte[] publicKey;
-
-   @LDAPField(attribute = "userCertificate")
-   private byte[] userCertificate;
-
-   @LDAPField(attribute = "userPKCS12")
-   private byte[] userPKCS12;
+   @LDAPField(attribute = "description")
+   private String description;
+   
+   @LDAPField(attribute = "employeeType")
+   private String employeeType;
+   
+//   @LDAPField(attribute = "keyAlgorithm")
+//   private String keyAlgorithm = "RSA";
+//
+//   @LDAPField(attribute = "privateKeyFormat")
+//   private String privateKeyFormat = "PKCS#8";
+//
+//   @LDAPField(attribute = "publicKeyFormat")
+//   private String publicKeyFormat = "X.509";
+//
+//   @LDAPField(attribute = "privateKey")
+//   private byte[] privateKey;
+//
+//   @LDAPField(attribute = "publicKey")
+//   private byte[] publicKey;
+//
+//   @LDAPField(attribute = "userCertificate")
+//   private byte[] userCertificate;
+//
+//   @LDAPField(attribute = "userPKCS12")
+//   private byte[] userPKCS12;
 
   
    public String getDn() {
@@ -79,60 +85,76 @@ public class User {
    public void setMail(String mail) {
        this.mail = mail;
    }
-
-   public String getKeyAlgorithm() {
-       return keyAlgorithm;
+   
+   public String getDescription() {
+       return description;
    }
 
-   public void setKeyAlgorithm(String keyAlgorithm) {
-       this.keyAlgorithm = keyAlgorithm;
+   public void setDescription(String description) {
+       this.description = description;
    }
 
-   public String getPrivateKeyFormat() {
-       return privateKeyFormat;
+   public String getEmployeeType() {
+       return employeeType;
    }
 
-   public void setPrivateKeyFormat(String privateKeyFormat) {
-       this.privateKeyFormat = privateKeyFormat;
+   public void setEmployeeType(String employeeType) {
+       this.employeeType = employeeType;
    }
-
-   public String getPublicKeyFormat() {
-       return publicKeyFormat;
-   }
-
-   public void setPublicKeyFormat(String publicKeyFormat) {
-       this.publicKeyFormat = publicKeyFormat;
-   }
-
-   public byte[] getPrivateKey() {
-       return privateKey;
-   }
-
-   public void setPrivateKey(byte[] privateKey) {
-       this.privateKey = privateKey;
-   }
-
-   public byte[] getPublicKey() {
-       return publicKey;
-   }
-
-   public void setPublicKey(byte[] publicKey) {
-       this.publicKey = publicKey;
-   }
-
-   public byte[] getUserCertificate() {
-       return userCertificate;
-   }
-
-   public void setUserCertificate(byte[] userCertificate) {
-       this.userCertificate = userCertificate;
-   }
-
-   public byte[] getUserPKCS12() {
-       return userPKCS12;
-   }
-
-   public void setUserPKCS12(byte[] userPKCS12) {
-       this.userPKCS12 = userPKCS12;
-   }
+   
+//   public String getKeyAlgorithm() {
+//       return keyAlgorithm;
+//   }
+//
+//   public void setKeyAlgorithm(String keyAlgorithm) {
+//       this.keyAlgorithm = keyAlgorithm;
+//   }
+//
+//   public String getPrivateKeyFormat() {
+//       return privateKeyFormat;
+//   }
+//
+//   public void setPrivateKeyFormat(String privateKeyFormat) {
+//       this.privateKeyFormat = privateKeyFormat;
+//   }
+//
+//   public String getPublicKeyFormat() {
+//       return publicKeyFormat;
+//   }
+//
+//   public void setPublicKeyFormat(String publicKeyFormat) {
+//       this.publicKeyFormat = publicKeyFormat;
+//   }
+//
+//   public byte[] getPrivateKey() {
+//       return privateKey;
+//   }
+//
+//   public void setPrivateKey(byte[] privateKey) {
+//       this.privateKey = privateKey;
+//   }
+//
+//   public byte[] getPublicKey() {
+//       return publicKey;
+//   }
+//
+//   public void setPublicKey(byte[] publicKey) {
+//       this.publicKey = publicKey;
+//   }
+//
+//   public byte[] getUserCertificate() {
+//       return userCertificate;
+//   }
+//
+//   public void setUserCertificate(byte[] userCertificate) {
+//       this.userCertificate = userCertificate;
+//   }
+//
+//   public byte[] getUserPKCS12() {
+//       return userPKCS12;
+//   }
+//
+//   public void setUserPKCS12(byte[] userPKCS12) {
+//       this.userPKCS12 = userPKCS12;
+//   }
 }
